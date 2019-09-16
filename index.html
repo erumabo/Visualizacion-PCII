@@ -7,7 +7,20 @@
   </head>
   <body>
     <div id="colorTest" syle="width:0;height:0;"></div>
-    <input type="file" accept="text/plain" onchange="abrirArchivo(event);">
+    <div class="input-group">
+      <div class="input-group-prepend">
+        <span class="input-group-text">Abrir</span>
+      </div>
+      <div class="custom-file">
+        <input type="file" class="custom-file-input" id="inVertex" onchange="abrirNodos(event);">
+        <label class="custom-file-label" for="inVertex" id="inVertexL"><i>nodos.txt</i></label>
+      </div>
+      <div class="custom-file">
+        <input type="file" class="custom-file-input" id="inAristas" onchange="abrirAristas(event);">
+        <label class="custom-file-label" for="inAristas" id="inAristasL"><i>aristas.txt</i></label>
+      </div>
+    </div>
+  
   <!-- JQuery -->
   <script
     src="https://code.jquery.com/jquery-3.4.1.min.js"
@@ -15,10 +28,6 @@
     crossorigin="anonymous"></script>
 
   <!-- Bootstrap -->
-  <!-- script
-    src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
-    integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
-    crossorigin="anonymous"></script>
   <link
     rel="stylesheet"
     href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
@@ -27,7 +36,7 @@
   <script
     src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
     integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
-    crossorigin="anonymous"></script -->
+    crossorigin="anonymous"></script>
   
   <!-- p5.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/p5.min.js"></script>
