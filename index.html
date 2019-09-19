@@ -21,10 +21,10 @@
       </div>
     </div>
     
-    <div class="input-group">
-      <button onclick="zoomin();">zoomin</button>
-      <button onclick="zoomout();">zoomout</button>
-      <button onclick="autozoom=true;">fit content</button>
+    <div class="btn-group" role="toolbar" style="display:block">
+      <button class="btn btn-secondary" onclick="zoomin(z=>{return z+0.5;});">zoomin</button>
+      <button class="btn btn-secondary" onclick="zoomin(z=>{return z-0.5;});">zoomout</button>
+      <button class="btn btn-secondary" onclick="autozoom=true;">fit content</button>
     </div>
   
   <!-- JQuery -->

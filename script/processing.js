@@ -21,13 +21,13 @@ function eucl(x,y,u,v){
 function nodoE(mx,my){
   select = false;
   layout.eachNode((n,p)=>{
-    let tx=tX(p.p.x);
-    let ty=tY(p.p.y);
+    let tx = tX(p.p.x), ty = tY(p.p.y);
     if(eucl(tx,ty,mx,my)<=(2*zoom)){
       select=true;
       nodo = n.id;
     }
   });
+  return select;
 }
 
 function tX(x){return (x+width/2)*zoom + dx;}
@@ -39,47 +39,49 @@ function render(){
   if(autozoom){
     let mx=Infinity,Mx=-Infinity,my=Infinity,My=-Infinity;
     layout.eachNode((n,p)=>{
-      if(p.p.x<mx)mx=p.p.x;
-      if(p.p.y<my)my=p.p.y;
-      if(p.p.x>Mx)Mx=p.p.x;
-      if(p.p.y>My)My=p.p.y;
+      mx=min(mx,p.p.x);
+      my=min(my,p.p.y);
+      Mx=max(Mx,p.p.x);
+      My=max(My,p.p.y);
     });
     if(abs(Mx-mx)<abs(My-my)){
-      zoom = w/abs(My-my);
+      zoom = w/(My-my+4);
       M = My;
     } else {
-      zoom = w/abs(Mx-mx);
+      zoom = w/(Mx-mx+4);
       M = Mx;
     }
-    dx = -(mx+w/2)*zoom;
-    dy = -(my+w/2)*zoom;
+    dx = -(mx-2+w/2)*zoom;
+    dy = -(my-2+w/2)*zoom;
   }
-  noStroke();
-  {
-    stroke(0,0,255);
-    layout.eachEdge((e,s)=>{
-      if(select && (e.source.id==nodo || e.target.id==nodo)){ stroke(0,0,0,255);strokeWeight(zoom>4?4:zoom);}
-      else{ stroke(0,0,0,100); strokeWeight(1);}
-      line(tX(s.point1.p.x),tY(s.point1.p.y),tX(s.point2.p.x),tY(s.point2.p.y));
-    });
-    
-    layout.eachNode((n,p)=>{
-      if(select && n.id == nodo){
-        fill(0,0,0,205);
-        stroke(0);
-        ellipse(tX(p.p.x),tY(p.p.y),2.5*zoom);
-      } else {
-        fill(0,0,0,100);
-        noStroke();
-        ellipse(tX(p.p.x),tY(p.p.y),2*zoom);
-      }
-      if(zoom>=3){
-        textSize(15+zoom);
-        fill(255);
-        text(n.id,tX(p.p.x),tY(p.p.y));
-      }
-    });
-  }
+  
+  layout.eachEdge((e,s)=>{
+    if(select && (e.source.id==nodo || e.target.id==nodo)) {
+      stroke(0,0,0,255);
+      strokeWeight(zoom>3?3:zoom);
+    } else {
+      stroke(0,0,0,100);
+      strokeWeight(1);
+    }
+    line(tX(s.point1.p.x),tY(s.point1.p.y),tX(s.point2.p.x),tY(s.point2.p.y));
+  });
+  
+  layout.eachNode((n,p)=>{
+    if(select && n.id == nodo){
+      fill(0,0,0,205);
+      stroke(0);
+      ellipse(tX(p.p.x),tY(p.p.y),2*zoom+4);
+    } else {
+      fill(0,0,0,100);
+      noStroke();
+      ellipse(tX(p.p.x),tY(p.p.y),2*zoom);
+    }
+    if(zoom>=3){
+      textSize(15+zoom);
+      fill(255);
+      text(n.id,tX(p.p.x),tY(p.p.y));
+    }
+  });
 }
 
 function setup(){
@@ -91,8 +93,6 @@ function setup(){
 }
 
 function draw(){
-  //fill(255,0,0);
-  //ellipse(tX(w*((1/zoom)-1)/2 - dx/zoom),tY(w*(1/zoom - 1)/2 - dy/zoom),55);
   if(animate){
     layout.tick(0.03);
     Springy.requestAnimationFrame(()=>{
@@ -102,50 +102,34 @@ function draw(){
   } else {
     render();
   }
-  /*noLoop();*/
 }
 
 function mouseWheel(event){
-  console.log(event.delta);
   zoom -= (event.delta/10);
   if(zoom>100)zoom=100;
   if(zoom<1)zoom=1;
 }
 
 function fixzoom(z){
-  //dx = w/2 * (z-zoom) + dx;
-  //dy = w/2 * (z-zoom) + dy;
   dx = dx*zoom/z + zoom*w*(1/zoom - 1/z)/2;
   dy = dy*zoom/z + zoom*w*(1/zoom - 1/z)/2;
 }
 
-function zoomout(){
-  let z=zoom;
+function zoomin(w){
+  let z = zoom;
   autozoom=false;
-  zoom -=0.5;
+  zoom = w(zoom);
+  if(zoom>100) zoom=100;
   if(zoom<1) zoom=1;
   fixzoom(z);
 }
-function zoomin(){
-  let z = zoom;
-  autozoom=false;
-  zoom +=0.5;
-  if(zoom>100)zoom=100;
-  fixzoom(z);
-}
 function keyPressed(){
-  if(key==='+'){ 
-    zoomin();
-    return false;
-  }
-  if(key==='-'){
-    zoomout();
-    return false;
-  }
+  if(key==='+'){zoomin(z=>{return z+0.5;});return false;}
+  if(key==='-'){zoomin(z=>{return z-0.5;});return false;}
   return true;
 }
 
-function touchStarted(){
+function inMouse(mouseX,mouseY){
   autozoom=false;
   nodoE(mouseX,mouseY);
   mx = mouseX;
@@ -153,17 +137,23 @@ function touchStarted(){
   px = dx;
   py = dy;
 }
-function mousePressed(){
-  nodoE(mouseX,mouseY);
-  mx = mouseX;
-  my = mouseY;
-  px = dx;
-  py = dy;
-}
+function touchStarted(){inMouse(mouseX,mouseY);return false;}
+function mousePressed(){inMouse(mouseX,mouseY);return false;}
 function mouseDragged(){
   change = true;
-  dx = mouseX-mx+px;
-  dy = mouseY-my+py;
+  if(select){
+    layout.eachNode((n,p)=>{
+      if(n.id == nodo){
+        p.p.x = mouseX/zoom - dx/zoom - w/2;
+        p.p.y = mouseY/zoom - dy/zoom - w/2;
+      }
+    });
+  } else {
+    dx = mouseX-mx+px;
+    dy = mouseY-my+py;
+  }
   return false;
 }
-
+function mouseReleased(){
+  if(select) animate = true;
+}
