@@ -137,7 +137,7 @@ function inMouse(mouseX,mouseY){
   px = dx;
   py = dy;
 }
-function touchStarted(){inMouse(mouseX,mouseY);return false;}
+function touchStarted(){inMouse(mouseX,mouseY);}
 function mousePressed(){inMouse(mouseX,mouseY);return false;}
 function mouseDragged(){
   change = true;
