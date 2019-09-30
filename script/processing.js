@@ -1,10 +1,4 @@
 let grafo = new Springy.Graph();
-grafo.addNodes('0','1','2','3','4','5','6','7','8','9','10','11','12','13','14','A','B','c','d,','e');
-grafo.addEdges(['0','3'],['0','5'],['3','5'],['3','10'],['3','12'],['10','12'],['5','14'],['5','12'],['12','14'],
-['1','8'],['1','6'],['6','8'],
-['2','7'],['2','9'],['7','9'],
-['4','11'],['4','13'],['11','13']);
-
 let layout = new Springy.Layout.ForceDirected(grafo, 40.0, 400.0, 0.5);
 
 let canvas, w;
@@ -13,6 +7,11 @@ let autozoom = true;
 let zoom = 1;
 let mx,my,dx,dy,px,py;
 let nodo = [undefined,undefined];
+let pesosDiv = [40,80],minWeight=0,maxWeight=120;
+
+layout.eachEdge((e,s)=>{
+  console.log(e);
+});
  
 function eucl(x,y,u,v){
   return sqrt((x-u)*(x-u)+(y-v)*(y-v));
@@ -56,12 +55,15 @@ function render(){
   }
   
   layout.eachEdge((e,s)=>{
+    if(e.data.weight<=pesosDiv[0]) strokeWeight(zoom*0.1);
+    else if(e.data.weight<=pesosDiv[1]) strokeWeight(zoom*0.5);
+    else strokeWeight(zoom*1);
     if(select && (e.source.id==nodo || e.target.id==nodo)) {
-      stroke(0,0,0,255);
-      strokeWeight(zoom>3?3:zoom);
+      stroke(0,0,0,150);
+      //strokeWeight(zoom>3?3:zoom);
     } else {
       stroke(0,0,0,100);
-      strokeWeight(1);
+      //strokeWeight(1);
     }
     line(tX(s.point1.p.x),tY(s.point1.p.y),tX(s.point2.p.x),tY(s.point2.p.y));
   });
@@ -70,6 +72,7 @@ function render(){
     if(select && n.id == nodo){
       fill(0,0,0,205);
       stroke(0);
+      strokeWeight(3);
       ellipse(tX(p.p.x),tY(p.p.y),2*zoom+4);
     } else {
       fill(0,0,0,100);
@@ -79,7 +82,7 @@ function render(){
     if(zoom>=3){
       textSize(15+zoom);
       fill(255);
-      text(n.id,tX(p.p.x),tY(p.p.y));
+      text(n.data.label,tX(p.p.x),tY(p.p.y));
     }
   });
 }
@@ -104,11 +107,6 @@ function draw(){
   }
 }
 
-function mouseWheel(event){
-  zoom -= (event.delta/10);
-  if(zoom>100)zoom=100;
-  if(zoom<1)zoom=1;
-}
 
 function fixzoom(z){
   dx = dx*zoom/z + zoom*w*(1/zoom - 1/z)/2;
@@ -123,13 +121,18 @@ function zoomin(w){
   if(zoom<1) zoom=1;
   fixzoom(z);
 }
+function mouseWheel(event){
+  zoomin(z=>z-event.delta);
+}
 function keyPressed(){
-  if(key==='+'){zoomin(z=>{return z+0.5;});return false;}
-  if(key==='-'){zoomin(z=>{return z-0.5;});return false;}
+  if(key==='+'){zoomin(z=>z+0.5);return false;}
+  if(key==='-'){zoomin(z=>z-0.5);return false;}
   return true;
 }
 
 function inMouse(mouseX,mouseY){
+  if(mouseX<0 || mouseX>w || mouseY<0 || mouseY>w) return change=false;
+  change = true;
   autozoom=false;
   nodoE(mouseX,mouseY);
   mx = mouseX;
@@ -140,7 +143,7 @@ function inMouse(mouseX,mouseY){
 function touchStarted(){inMouse(mouseX,mouseY);}
 function mousePressed(){inMouse(mouseX,mouseY);return false;}
 function mouseDragged(){
-  change = true;
+  if(!change)return;
   if(select){
     layout.eachNode((n,p)=>{
       if(n.id == nodo){

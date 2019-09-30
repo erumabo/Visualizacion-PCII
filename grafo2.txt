@@ -1,0 +1,2 @@
+(nA,nC,nB,nD,nE,nF,nG,nH,nI,nJ,nK,nL,nM,nN,nO,A,B,c,d,e,'19');
+('19',e,29)(nA,nD,1),(nA,nF,2),(nD,nF,3),(nD,nK,4),(nD,nM,5),(nK,nM,6),(nF,nO,7),(nF,nM,8),(nM,nO,9),(nC,nI,10),(nC,nG,11),(nG,nI,12),(nB,nH,13),(nB,nJ,14),(nH,nJ,15),(nE,nL,16),(nE,nN,17),(nL,nN,18)
