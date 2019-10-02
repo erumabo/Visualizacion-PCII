@@ -1,6 +1,8 @@
 function descompone(arista){
   let [a,b] = arista.match(/([A-Za-z]+|\'[A-Za-z0-9]+\')/g)
-     ,p = arista.match(/[0-9]+/g).pop();
+      ,p,ws = arista.match(/[0-9]+/g);
+  if(ws) p = ws.pop();
+  else p = 1;
   return [a.replace(/'/g,""),b.replace(/'/g,""),+p];
 }
 
@@ -14,15 +16,15 @@ function abrirGrafo(event){
   minWeight = Infinity
   reader.onload = function(){
     let lines = reader.result.split('\n');
-    let mNodos = lines[0].match(/([A-Za-z]+|\'[A-Za-z0-9]+\')/g)
+    let mNodos = lines.shift().match(/([A-Za-z]+|\'[A-Za-z0-9]+\')/g)
     if(mNodos)  mNodos.forEach(nodo=>nodos[nodo.replace(/'/g,"")]=grafo.newNode({'label':nodo.replace(/'/g,"")}).id);
-    let mAristas = lines[1].match(/([A-Za-z]+|\'[A-Za-z0-9]+\'),([A-Za-z]+|\'[A-Za-z0-9]+\'),[0-9]+/g)
+    let mAristas = lines.join().match(/\(([A-Za-z]+|\'[A-Za-z0-9]+\'),([A-Za-z]+|\'[A-Za-z0-9]+\')(,[0-9]+|,?)\)/g)
     if(mAristas) mAristas.forEach(arista=>{
       let [s,t,w] = descompone(arista);
       grafo.newEdge(grafo.nodeSet[nodos[s]],grafo.nodeSet[nodos[t]],{'weight':w,'s':s,'t':t});
       maxWeight = (w>maxWeight)?w:maxWeight;
       minWeight = (w<minWeight)?w:minWeight;
-      console.log(minWeight,maxWeight);
+      //console.log(minWeight,maxWeight);
     });
     layout = new Springy.Layout.ForceDirected(grafo, 40.0, 400.0, 0.5);
     autozoom = true;
@@ -37,6 +39,8 @@ function abrirGrafo(event){
     });
     pesosDiv = [minWeight,maxWeight];
     $('#pesosDispl').html(` ${minWeight} > Liviano > ${minWeight} > Medio > ${maxWeight} > Pesado > ${maxWeight}`);
+    /*layout.eachEdge((e,s)=>s.k*=(1.0-e.data.weight/maxWeight));
+    layout.eachEdge((e,s)=>console.log(s.k));*/
   };
   reader.readAsText(input.files[0]);
 };
@@ -56,4 +60,4 @@ $(document).ready(()=>{
     slide: cambioPesos,
   });
   $('#pesosDispl').html(` ${minWeight} > Liviano > ${minWeight} > Medio > ${maxWeight} > Pesado > ${maxWeight}`);
-})
+});
