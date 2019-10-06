@@ -7,27 +7,27 @@ function descompone(arista){
 }
 
 function abrirGrafo(event){
-  let input = event.target;
   let reader = new FileReader();
   let nodos={};
-  $('#inGrafoL').html(input.files[0].name);
+  $('#inGrafoL').html(event.target.files[0].name);
   grafo =  new Springy.Graph();
   maxWeight = -Infinity;
-  minWeight = Infinity
-  reader.onload = function(){
-    let lines = reader.result.split('\n');
-    let mNodos = lines.shift().match(/([A-Za-z]+|\'[A-Za-z0-9]+\')/g)
-    if(mNodos)  mNodos.forEach(nodo=>nodos[nodo.replace(/'/g,"")]=grafo.newNode({'label':nodo.replace(/'/g,"")}).id);
-    let mAristas = lines.join().match(/\(([A-Za-z]+|\'[A-Za-z0-9]+\'),([A-Za-z]+|\'[A-Za-z0-9]+\')(,[0-9]+|,?)\)/g)
-    if(mAristas) mAristas.forEach(arista=>{
-      let [s,t,w] = descompone(arista);
-      grafo.newEdge(grafo.nodeSet[nodos[s]],grafo.nodeSet[nodos[t]],{'weight':w,'s':s,'t':t});
-      maxWeight = (w>maxWeight)?w:maxWeight;
-      minWeight = (w<minWeight)?w:minWeight;
-      //console.log(minWeight,maxWeight);
-    });
+  minWeight = Infinity;
+  reader.onload = ()=>{
+    let lines, mNodos, mAristas;
+    lines = reader.result.split('\n');
+    mNodos = lines.shift().match(/([A-Za-z]+|\'[A-Za-z0-9]+\')/g);
+    if(mNodos)
+      mNodos.forEach( nodo => nodos[nodo.replace(/'/g,"")] = grafo.newNode({'label':nodo.replace(/'/g,"")}).id );
+    mAristas = lines.join().match(/\(([A-Za-z]+|\'[A-Za-z0-9]+\'),([A-Za-z]+|\'[A-Za-z0-9]+\')(,[0-9]+|,?)\)/g);
+    if(mAristas)
+      mAristas.forEach(arista=>{
+        let [s,t,w] = descompone(arista);
+        grafo.newEdge(grafo.nodeSet[nodos[s]],grafo.nodeSet[nodos[t]],{'weight':w,'s':s,'t':t});
+        maxWeight = (w>maxWeight)?w:maxWeight;
+        minWeight = (w<minWeight)?w:minWeight;
+      });
     layout = new Springy.Layout.ForceDirected(grafo, 40.0, 400.0, 0.5);
-    autozoom = true;
     animate = true;
     $('#pesos-slider').slider('destroy');
     $('#pesos-slider').slider({
@@ -39,10 +39,8 @@ function abrirGrafo(event){
     });
     pesosDiv = [minWeight,maxWeight];
     $('#pesosDispl').html(` ${minWeight} > Liviano > ${minWeight} > Medio > ${maxWeight} > Pesado > ${maxWeight}`);
-    /*layout.eachEdge((e,s)=>s.k*=(1.0-e.data.weight/maxWeight));
-    layout.eachEdge((e,s)=>console.log(s.k));*/
   };
-  reader.readAsText(input.files[0]);
+  reader.readAsText(event.target.files[0]);
 };
 
 function cambioPesos(ev,ui){
@@ -52,6 +50,7 @@ function cambioPesos(ev,ui){
 }
 
 $(document).ready(()=>{
+  $('#switch-origin')[0].checked = $('#switch-grafo')[0].checked = $('#switch-zoom')[0].checked=true;
   $('#pesos-slider').slider({
     range: true,
     min: 0,

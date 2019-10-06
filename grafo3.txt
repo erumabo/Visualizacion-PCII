@@ -1,8 +1,8 @@
 (a,b,c,d,e,f,g,h,i,j,k)
-(a,f,),(a,b),(a,c,10),
+(a,f,),(a,b),(a,c,),
 (b,f,),(c,f),(b,e),
 (e,f),(c,g),(f,g),
-(a,g),(a,e),(a,k),
+(a,g),(a,e),(a,k,21),
 (e,i),(f,i),(f,j),(g,j),
 (f,k),(i,k),(j,k),(e,k),(g,k),
 (a,d),(a,h),(k,d),(k,h),

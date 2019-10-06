@@ -1,18 +1,16 @@
 let grafo = new Springy.Graph();
+grafo.addNodes('a','b','c','d','e');
+grafo.addEdges(
+  ['a','b'],['c','d'],['b','c'],['d','e'],['e','a']
+);
 let layout = new Springy.Layout.ForceDirected(grafo, 40.0, 400.0, 0.5);
 
-let canvas, w;
-let change = true, animate=true, select=false;
-let autozoom = true;
-let zoom = 1;
+/*globals of control*/
+let canvas, w, select=false;
+let origin = true, change = true, animate=true, autozoom = true, grafomode=true;
 let mx,my,dx,dy,px,py;
-let nodo = [undefined,undefined];
-let pesosDiv = [40,80],minWeight=0,maxWeight=120;
+let nodo = [undefined,undefined], pesosDiv = [40,80], minWeight=0, maxWeight=120, zoom=1;
 
-layout.eachEdge((e,s)=>{
-  console.log(e);
-});
- 
 function eucl(x,y,u,v){
   return sqrt((x-u)*(x-u)+(y-v)*(y-v));
 }
@@ -32,60 +30,6 @@ function nodoE(mx,my){
 function tX(x){return (x+width/2)*zoom + dx;}
 function tY(y){return (y+height/2)*zoom + dy;}
 
-function render(){
-  background(206);
-  let M;
-  if(autozoom){
-    let mx=Infinity,Mx=-Infinity,my=Infinity,My=-Infinity;
-    layout.eachNode((n,p)=>{
-      mx=min(mx,p.p.x);
-      my=min(my,p.p.y);
-      Mx=max(Mx,p.p.x);
-      My=max(My,p.p.y);
-    });
-    if(abs(Mx-mx)<abs(My-my)){
-      zoom = w/(My-my+4);
-      M = My;
-    } else {
-      zoom = w/(Mx-mx+4);
-      M = Mx;
-    }
-    dx = -(mx-2+w/2)*zoom;
-    dy = -(my-2+w/2)*zoom;
-  }
-  
-  layout.eachEdge((e,s)=>{
-    if(e.data.weight<=pesosDiv[0]) strokeWeight(zoom*0.1);
-    else if(e.data.weight<=pesosDiv[1]) strokeWeight(zoom*0.5);
-    else strokeWeight(zoom*1);
-    if(select && (e.source.id==nodo || e.target.id==nodo)) {
-      stroke(0,0,0,150);
-      //strokeWeight(zoom>3?3:zoom);
-    } else {
-      stroke(0,0,0,100);
-      //strokeWeight(1);
-    }
-    line(tX(s.point1.p.x),tY(s.point1.p.y),tX(s.point2.p.x),tY(s.point2.p.y));
-  });
-  
-  layout.eachNode((n,p)=>{
-    if(select && n.id == nodo){
-      fill(0,0,0,205);
-      stroke(0);
-      strokeWeight(3);
-      ellipse(tX(p.p.x),tY(p.p.y),2*zoom+4);
-    } else {
-      fill(0,0,0,100);
-      noStroke();
-      ellipse(tX(p.p.x),tY(p.p.y),2*zoom);
-    }
-    if(zoom>=3){
-      textSize(15+zoom);
-      fill(255);
-      text(n.data.label,tX(p.p.x),tY(p.p.y));
-    }
-  });
-}
 
 function setup(){
   px = py = dx = dy = 0;
@@ -96,67 +40,93 @@ function setup(){
 }
 
 function draw(){
-  if(animate){
-    layout.tick(0.03);
-    Springy.requestAnimationFrame(()=>{
-      render();
-      if(layout.totalEnergy()<layout.minEnergyThreshold) animate=false;
-    });
+  if(grafomode){
+    if(animate){
+      layout.tick(0.03);
+      Springy.requestAnimationFrame(()=>{
+        graforender();
+        if(layout.totalEnergy()<layout.minEnergyThreshold) animate=false;
+      });
+    } else {
+      graforender();
+    }
   } else {
-    render();
+    matrixRender();
   }
 }
 
 
+/*
+ *Funciones que se encargan de manejar la interacción de processing con la interfaz
+ */
+
+/*Capitulo Uno, del control de zoom por mouse, teclado y botones*/
 function fixzoom(z){
   dx = dx*zoom/z + zoom*w*(1/zoom - 1/z)/2;
   dy = dy*zoom/z + zoom*w*(1/zoom - 1/z)/2;
 }
-
 function zoomin(w){
   let z = zoom;
-  autozoom=false;
+  $('#switch-zoom')[0].checked = autozoom = false;
   zoom = w(zoom);
   if(zoom>100) zoom=100;
   if(zoom<1) zoom=1;
   fixzoom(z);
+  return false;
 }
 function mouseWheel(event){
-  zoomin(z=>z-event.delta);
+  if(mouseX<0 || mouseX>w || mouseY<0 || mouseY>w) return true;
+  return zoomin(z=>z-event.delta);
 }
 function keyPressed(){
-  if(key==='+'){zoomin(z=>z+0.5);return false;}
-  if(key==='-'){zoomin(z=>z-0.5);return false;}
+  if(key==='+') return zoomin(z=>z+0.5)
+  if(key==='-') return zoomin(z=>z-0.5)
   return true;
 }
 
+/*Captulo Dos, del movimiento del mouse y el arrastre del grafo*/
 function inMouse(mouseX,mouseY){
   if(mouseX<0 || mouseX>w || mouseY<0 || mouseY>w) return change=false;
-  change = true;
-  autozoom=false;
-  nodoE(mouseX,mouseY);
+  if(grafomode) nodoE(mouseX,mouseY);
   mx = mouseX;
   my = mouseY;
   px = dx;
   py = dy;
+  return change = true;
 }
 function touchStarted(){inMouse(mouseX,mouseY);}
 function mousePressed(){inMouse(mouseX,mouseY);return false;}
 function mouseDragged(){
-  if(!change)return;
-  if(select){
-    layout.eachNode((n,p)=>{
-      if(n.id == nodo){
-        p.p.x = mouseX/zoom - dx/zoom - w/2;
-        p.p.y = mouseY/zoom - dy/zoom - w/2;
-      }
-    });
-  } else {
-    dx = mouseX-mx+px;
-    dy = mouseY-my+py;
+  if(grafomode){
+    if(!change) return;
+    if(select){
+      layout.eachNode((n,p)=>{
+        if(n.id == nodo){
+          p.p.x = mouseX/zoom - dx/zoom - w/2;
+          p.p.y = mouseY/zoom - dy/zoom - w/2;
+        }
+      });
+    } else {
+      $('#switch-zoom')[0].checked = autozoom = false;
+      dx = mouseX-mx+px;
+      dy = mouseY-my+py;
+    }
   }
   return false;
 }
 function mouseReleased(){
   if(select) animate = true;
+}
+
+/*Capitulo Tres, de los switches y otros botones*/
+function autozoomSwitch(){
+  autozoom = $('#switch-zoom')[0].checked;
+}
+function grafomodeSwitch(){
+  grafomode = $('#switch-grafo')[0].checked;
+  if(grafomode) $('#div-origin').show();
+  else $('#div-origin').hide();
+}
+function originSwitch(){
+ origin = $('#switch-origin')[0].checked;
 }

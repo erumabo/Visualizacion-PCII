@@ -4,11 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Proyecto II - Grafos</title>
+    <link rel="stylesheet" href="style/switch.css">
+    <link rel="stylesheet" href="style/canvas.css">
   </head>
   <body>
     <!-- div id="colorTest" syle="width:0;height:0;"></div-->
     <div style="width:100%">
-      <div class="input-group" style="border:2px solid red;width:100%;">
+      <div class="input-group" style="width:100%;">
         <div class="input-group-prepend">
           <span class="input-group-text">Abrir</span>
         </div>
@@ -16,17 +18,43 @@
           <input type="file" class="custom-file-input" id="inGrafo" onchange="abrirGrafo(event);">
           <label class="custom-file-label" for="inVertex" id="inGrafoL"><i>grafo.txt</i></label>
         </div>
-      <div style="border:2px solid red;width:50%;display:inline;">
+      <div style="width:50%;display:inline;">
         <div id="pesos-slider"></div>
         <div id="pesosDispl"></div>
       </div>
       </div>
     </div>
     
-    <div class="btn-group" role="toolbar" style="display:block">
-      <button class="btn btn-secondary" onclick="zoomin(z=>{return z+0.5;});">zoomin</button>
-      <button class="btn btn-secondary" onclick="zoomin(z=>{return z-0.5;});">zoomout</button>
-      <button class="btn btn-secondary" onclick="autozoom=true;">fit content</button>
+    <div class="input-group input-group-sm" role="toolbar" style="display:inline-block">
+      <div class="input-group-prepend">
+        <button class="btn btn-secondary" onclick="zoomin(z=>{return z+0.5;});">Acercar</button>
+        <button class="btn btn-secondary" onclick="zoomin(z=>{return z-0.5;});">Alejar</button>
+        <div class="input-group-text">
+          <label style="display:inline">Auto-Zoom</label>
+          <label class="switch">
+            <input id="switch-zoom" class="switch-input" type="checkbox" checked onclick="autozoomSwitch();">
+            <span class="switch-label" data-on="On" data-off="Off"></span> 
+            <span class="switch-handle"></span> 
+          </label>
+        </div>
+        <div class="input-group-text">
+          <label style="display:inline">Grafo</label>
+          <label class="switch">
+            <input id="switch-grafo" class="switch-input" type="checkbox" checked onclick="grafomodeSwitch();">
+            <span class="switch-label" data-on="Grafo" data-off="Matriz"></span> 
+            <span class="switch-handle"></span> 
+          </label>
+          <label style="display:inline">Matriz</label>
+        </div>
+        <div class="input-group-text" id="div-origin">
+          <label style="display:inline">Mostrar Origen</label>
+          <label class="switch">
+            <input id="switch-origin" class="switch-input" type="checkbox" checked onclick="originSwitch();">
+            <span class="switch-label" data-on="On" data-off="Off"></span> 
+            <span class="switch-handle"></span> 
+          </label>
+        </div>
+      </div>
     </div>
   
   <!-- JQuery -->
@@ -55,7 +83,10 @@
 
   <!-- graph scripts -->
   <script type="text/javascript" src="script/springy.js"></script>
+  <script type="text/javascript" src="script/grafoRender.js"></script>
+  <script type="text/javascript" src="script/matrixRender.js"></script>
   <script type="text/javascript" src="script/processing.js"></script>
   <script type="text/javascript" src="script/gui.js"></script>
+  
   </body>
 </html>
