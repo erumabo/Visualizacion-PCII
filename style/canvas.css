@@ -1,5 +1,9 @@
 canvas{
- margin:0;
- margin-lefT:50%;
- transform:translate(-50%,0);
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin:0;
+  margin-lefT: 50%;
+  transform: translate(-50%,0);
+  z-index:-1;
 }
