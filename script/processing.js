@@ -63,8 +63,8 @@ function mouseWheel(event){
   return zoomin(z=>z-event.delta,mouseX,mouseY);
 }
 function keyPressed(){
-  if(key==='+') return zoomin(z=>z+5)
-  if(key==='-') return zoomin(z=>z-5)
+  if(key==='+') return zoomin(z=>z+5);
+  if(key==='-') return zoomin(z=>z-5);
   if(key==='ArrowLeft'){ dx-=24*(zoom); return false;}
   if(key==='ArrowRight'){ dx+=24*(zoom); return false;}
   if(key==='ArrowUp'){ dy-=24*(zoom); return false;}
@@ -74,8 +74,8 @@ function keyPressed(){
 
 /*Captulo Dos, del movimiento del mouse y el arrastre del grafo*/
 function inMouse(mouseX,mouseY){
-  if(!document.elementFromPoint(mouseX,mouseY).classList.contains('canvas-click')) return change=false;
-  if(mouseButton===LEFT){
+  if(!document.elementFromPoint(mouseX,mouseY).classList.contains('canvas-click')) return !(change=false);
+  if(mouseButton===LEFT || touches.length===1){
     if(grafomode) nodoE(mouseX,mouseY);
     else{
       rcE(mouseX, mouseY);
@@ -85,20 +85,20 @@ function inMouse(mouseX,mouseY){
     my = mouseY;
     px = dx;
     py = dy;
-  } else if(mouseButton === CENTER){
+  } else if(mouseButton === CENTER || touches.length === 2){
     mx = mouseX;
     my = mouseY;
     px = dx;
     py = dy;
   }
-  return change = true;
+  return !(change = true);
 }
-function touchStarted(){inMouse(mouseX,mouseY);return false;}
-function mousePressed(){inMouse(mouseX,mouseY);return false;}
+function touchStarted(){return inMouse(mouseX,mouseY);}
+function mousePressed(){return inMouse(mouseX,mouseY);}
 function mouseDragged(){
   if(!change) return true;
   if(grafomode){
-    if( mouseButton===LEFT && select){
+    if( (mouseButton === LEFT || touches.length === 1) && select){
       layout.eachNode((n,p)=>{
         if(n.id == nodo){
           p.p.x = mouseX/zoom - dx/zoom - w/2;
@@ -111,7 +111,7 @@ function mouseDragged(){
   } else {
     $('#switch-zoom')[0].checked = autozoom = false;
   }
-  if(mouseButton === CENTER){
+  if(mouseButton === CENTER || touches.length === 2){
     dx = mouseX-mx+px;
     dy = mouseY-my+py;
   }
