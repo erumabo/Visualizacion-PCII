@@ -1,3 +1,22 @@
+function eucl(x,y,u,v){
+  return sqrt((x-u)*(x-u)+(y-v)*(y-v));
+}
+
+function nodoE(mx,my){
+  select = false;
+  layout.eachNode((n,p)=>{
+    let tx = tX(p.p.x), ty = tY(p.p.y);
+    if(eucl(tx,ty,mx,my)<=(2*zoom)){
+      select=true;
+      nodo = n.id;
+    }
+  });
+  return select;
+}
+
+function tX(x){return (x+width/2)*zoom + dx;}
+function tY(y){return (y+height/2)*zoom + dy;}
+
 function graforender(){
   background(206);
   let M;
@@ -9,20 +28,21 @@ function graforender(){
       Mx=max(Mx,p.p.x);
       My=max(My,p.p.y);
     });
+    let wh = min(w,h), hw = max(w,h);
     if(abs(Mx-mx)<abs(My-my)){
-      zoom = w/(My-my+4);
+      zoom = wh/(My-my+4);
       M = My;
     } else {
-      zoom = w/(Mx-mx+4);
+      zoom = wh/(Mx-mx+4);
       M = Mx;
     }
-    dx = -(mx-2+w/2)*zoom;
-    dy = -(my-2+w/2)*zoom;
+    dx = ((Mx+mx+w)/2)*(1-zoom);
+    dy = ((My+my+h)/2)*(1-zoom);
   }
   if(origin){
     strokeWeight(1);
     stroke(0);
-    line(tX(0),tY(-w),tX(0),tY(w));
+    line(tX(0),tY(-h),tX(0),tY(h));
     line(tX(-w),tY(0),tX(w),tY(0));
     fill(255);
     ellipse(tX(0),tY(0),5);
@@ -43,7 +63,7 @@ function graforender(){
     }
     line(tX(s.point1.p.x),tY(s.point1.p.y),tX(s.point2.p.x),tY(s.point2.p.y));
   });
-  
+  textAlign(LEFT,BOTTOM); 
   layout.eachNode((n,p)=>{
     if(select && n.id == nodo){
       fill(55,52,69,200);
@@ -62,4 +82,3 @@ function graforender(){
     }
   });
 }
-

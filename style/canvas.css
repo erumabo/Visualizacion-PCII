@@ -1,3 +1,10 @@
+.collapsing.width{
+  position: relative;
+  width:0;
+  overflow: hidden;
+  transition: width .35s ease;
+}
+
 canvas{
   position: absolute;
   top: 0;

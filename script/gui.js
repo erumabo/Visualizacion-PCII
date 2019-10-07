@@ -27,8 +27,9 @@ function abrirGrafo(event){
         maxWeight = (w>maxWeight)?w:maxWeight;
         minWeight = (w<minWeight)?w:minWeight;
       });
-    layout = new Springy.Layout.ForceDirected(grafo, 40.0, 400.0, 0.5);
+    layout = new Springy.Layout.ForceDirected(grafo, 4.0, 400.0, 0.5);
     animate = true;
+    matriz = undefined;
     $('#pesos-slider').slider('destroy');
     $('#pesos-slider').slider({
       range: true,
@@ -50,7 +51,9 @@ function cambioPesos(ev,ui){
 }
 
 $(document).ready(()=>{
-  $('#switch-origin')[0].checked = $('#switch-grafo')[0].checked = $('#switch-zoom')[0].checked=true;
+  $('#switch-origin')[0].checked = origin = true;
+  $('#switch-grafo')[0].checked = grafomode = true;
+  $('#switch-zoom')[0].checked = autozoom = true;
   $('#pesos-slider').slider({
     range: true,
     min: 0,
@@ -60,3 +63,5 @@ $(document).ready(()=>{
   });
   $('#pesosDispl').html(` ${minWeight} > Liviano > ${minWeight} > Medio > ${maxWeight} > Pesado > ${maxWeight}`);
 });
+
+let toolbaricon = true;
