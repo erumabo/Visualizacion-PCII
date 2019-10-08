@@ -10,7 +10,7 @@
   <body class="canvas-click">
     <div class="card" style="width:400px;background:none;position:absolute;right:0;top:0;">
       <div class="card-header canvas-click" style="background:#FFF8;margin:0;padding:0;">
-        <button class="btn btn-secondary" id="toolbartoggle" style="float:right;" data-toggle="collapse" data-target='#toolbar' onclick="$('#toolbartoggle').html('Toolbar &'+(toolbaricon?'u':'d')+'trif;');toolbaricon=!toolbaricon">toolbar &dtrif;</button>
+        <button class="btn btn-secondary" id="toolbartoggle" style="float:right;" data-toggle="collapse" data-target='#toolbar' onclick="$('#toolbartoggle').html('Herramientas &'+(toolbaricon?'u':'d')+'trif;');toolbaricon=!toolbaricon">Herramientas &dtrif;</button>
       </div>
       <div class="card-body collapse" id="toolbar" style="width:100%;background:#FFFB;">
         <div class="input-group" style="width:100%;">
@@ -18,7 +18,7 @@
             <span class="input-group-text">Abrir</span>
           </div>
           <div class="custom-file" style="height:100%;">
-            <input type="file" class="custom-file-input" id="inGrafo" onchange="abrirGrafo(event);">
+            <input type="file" class="custom-file-input" id="inGrafo" lang="es" onchange="abrirGrafo(event);">
             <label class="custom-file-label" for="inVertex" id="inGrafoL"><i>grafo.txt</i></label>
           </div>
         </div>
